@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  width: 400px;
+}
+
+input {
+  /* min-width: 200px;
+  max-width: 400px; */
+  width: 100%;
+}
+
+p {
+  margin-top: 5px;
+}
+
+.btn-login {
+  margin-top: 4px;
+}
+
+.register {
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    opacity: 0.6;
+  }
+}
