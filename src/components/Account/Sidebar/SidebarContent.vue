@@ -1,20 +1,35 @@
 <script setup>
-import { reactive } from 'vue'
+import { userApi } from '@/apis/UserApi'
+import { useMutation } from '@tanstack/vue-query'
+import { reactive, ref } from 'vue'
+
+// TODO: create useMutation hook
+// TODO: set user info after returning from API
+
+const errorMessage = ref(null)
 
 const form = reactive({
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'johndoe@example.com',
-  dateOfBirth: '1990-01-01'
+  firstName: '',
+  lastName: '',
+  email: '',
+  dateOfBirth: '',
+  phone: ''
 })
 
 const validateForm = () => {
-  console.log('Form submitted', form)
+  if (!form.firstName && !form.lastName && !form.email && !form.dateOfBirth && form.phone) {
+    return false
+  }
+  return true
 }
+
+const { isPending, mutate } = useMutation({
+  mutationFn: userApi.addInfoApi
+})
 </script>
 
 <template>
-  <div>
+  <div class="container">
     <strong>
       <h3>MY DETAIL</h3>
     </strong>
@@ -27,13 +42,33 @@ const validateForm = () => {
             type="text"
             class="form-control last-name"
             id="last-name"
+            placeholder="Enter your last name"
             required
           />
         </div>
 
         <div class="email">
           <label class="form-label">Email Address</label>
-          <input v-model="form.email" type="email" class="form-control email" id="email" required />
+          <input
+            v-model="form.email"
+            type="email"
+            class="form-control email"
+            id="email"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        <div class="phone">
+          <label class="form-label"> Phone Number</label>
+          <input
+            v-model="form.number"
+            type="text"
+            class="form-control email"
+            id="phone"
+            placeholder="Enter your phone number"
+            required
+          />
         </div>
 
         <div class="date-of-birth">
@@ -52,12 +87,12 @@ const validateForm = () => {
         </div>
         <div class="mb-3 text-start d-flex justify-content-evenly">
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="women-clothes" id="women-clothes" />
-            <label class="form-check-label" for="women-clothes">Womenswear </label>
+            <input class="form-check-input" type="radio" name="clothes" id="women-clothes" />
+            <label class="form-check-label" for="women-clothes">Womenswear</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="men-clothes" id="men-clothes" />
-            <label class="form-check-label" for="flexRadioDefault2">Menswear</label>
+            <input class="form-check-input" type="radio" name="clothes" id="men-clothes" />
+            <label class="form-check-label" for="men-clothes">Menswear</label>
           </div>
         </div>
 
@@ -68,9 +103,31 @@ const validateForm = () => {
 </template>
 
 <style scoped>
-div {
+.container {
   width: 500px;
-  height: 100%;
+  padding: 20px;
   background-color: #f0f8ff;
+  height: auto;
+  /* margin: 0 auto; */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  margin-bottom: 20px;
+}
+
+.form-check {
+  margin-right: 10px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 </style>

@@ -1,13 +1,24 @@
 <script setup>
+import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+
+const router = useRouter()
+
 const handleClick = () => {
-  console.log('is called')
+  router.push({
+    name: 'product_detail'
+  })
 }
+
+const cardWidth = computed(() => {
+  return router.currentRoute.value.name === 'product_detail' ? '200px' : '318px'
+})
 </script>
 
 <template>
-  <div class="product-container" @click="handleClick">
+  <div class="product-container" @click="handleClick" :style="{ maxWidth: cardWidth }">
     <img
-      src="https://images.asos-media.com/products/topshop-tab-belted-twill-car-coat-in-grey/206033977-1-grey?$n_480w$&wid=476&fit=constrain"
+      src="https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-1-white?$n_640w$&wid=513&fit=constrain"
       alt="Tab Belted Twill Car Coat"
       class="product-image"
     />
@@ -24,23 +35,26 @@ const handleClick = () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .product-container {
   display: flex;
   flex-direction: column;
-  margin: 20px;
-  max-width: 318px;
+  margin: 10px;
   border-radius: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex: 1 1 calc(25% - 40px);
+  // max-width: 318px;
   transition: box-shadow 0.3s ease-in-out;
-}
 
-.product-container:hover {
-  box-shadow:
-    rgba(0, 0, 0, 0.25) 0px 54px 55px,
-    rgba(0, 0, 0, 0.12) 0px -12px 30px,
-    rgba(0, 0, 0, 0.12) 0px 4px 6px,
-    rgba(0, 0, 0, 0.17) 0px 12px 13px,
-    rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  &:hover {
+    box-shadow:
+      rgba(0, 0, 0, 0.25) 0px 54px 55px,
+      rgba(0, 0, 0, 0.12) 0px -12px 30px,
+      rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px,
+      rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
 }
 
 .product-image {

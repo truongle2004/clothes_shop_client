@@ -96,7 +96,7 @@ const validateForm = () => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .container {
   margin-top: 50px;
 }
