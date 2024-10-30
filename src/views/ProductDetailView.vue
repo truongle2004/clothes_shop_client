@@ -1,15 +1,21 @@
 <script setup>
 import { ref } from 'vue'
-import ListProductsView from './ListProductsView.vue'
+import ListProductsView from '@/views/ListProductsView.vue'
 
 const widthListCard = '400px'
 
-const mockImage =
-  'https://lh7-rt.googleusercontent.com/docsz/AD_4nXfAo8Gqet3V7asr2xUuHafc-jcGg9UuTWxbL2tLPbZWZvTJ_bg_ERqMn47zrzw5x3G57Klx7zkQvET8g0hpwVcbg8fL3WE_btZB9ci6-gsV5rkn80yaSfVBL88n1DwrBM-KsYBknrwIvKcZjahv71w-1s5j?key=v8ba6Z10Wr-7QNx-8gMTgw'
+const listCover = [
+  ' https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-1-white?$n_320w$&wid=317&fit=constrain ',
+  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-2?$n_320w$&wid=317&fit=constrain',
+  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-3?$n_320w$&wid=317&fit=constrain',
+  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-4?$n_320w$&wid=317&fit=constrain'
+]
 
 const showProductDetailInfo = ref(false)
 const showBrandDetailInfo = ref(false)
 const showAboutMeInfo = ref(false)
+
+const selectedImage = ref(listCover[0])
 
 const handleClickProductDetailBtn = () => {
   showProductDetailInfo.value = !showProductDetailInfo.value
@@ -22,23 +28,29 @@ const handleClickBrandDetailBtn = () => {
 const handleClickShowAboutMeBtn = () => {
   showAboutMeInfo.value = !showAboutMeInfo.value
 }
+
+const handleSelectImage = (index) => {
+  selectedImage.value = listCover[index]
+}
 </script>
 
 <template>
   <div class="container d-flex gap-4">
-    <!-- Left Section with Gallery -->
     <div class="side-left d-flex gap-3">
       <div class="left-gallery d-flex flex-column gap-2">
-        <img class="img-thumbnail" :src="mockImage" alt="Gallery Image 1" />
-        <img class="img-thumbnail" :src="mockImage" alt="Gallery Image 2" />
-        <img class="img-thumbnail" :src="mockImage" alt="Gallery Image 3" />
+        <img
+          class="img-thumbnail"
+          alt="Gallery Image"
+          v-for="(image, index) in listCover"
+          :key="index"
+          :src="image"
+          @click="handleSelectImage(index)"
+        />
       </div>
       <div class="swiper-images">
-        <img class="img-fluid" :src="mockImage" alt="Main Gallery Image" />
+        <img class="img-fluid" :src="selectedImage" alt="Main Gallery Image" />
       </div>
     </div>
-
-    <!-- Right Section with Product Details -->
     <div class="side-right d-flex flex-column gap-2">
       <h3 class="header-title">Topshop Heidi Knitted Headscarf in Cream</h3>
       <div class="price">£100.00</div>
@@ -97,6 +109,11 @@ const handleClickShowAboutMeBtn = () => {
         </div>
       </div>
     </div>
+  </div>
+  <div>
+    <strong>
+      <h4 style="margin-top: 2rem; margin-left: 5rem; font-weight: bold">YOU MIGHT ALSO LIKE</h4>
+    </strong>
   </div>
   <ListProductsView :card-width="widthListCard" />
 </template>
