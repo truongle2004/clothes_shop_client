@@ -1,18 +1,22 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue'
+import NavBar from '@/components/NavBar.vue'
 import UserInfo from '@/components/Form/UserInfo/UserInfo.vue'
 import AccountView from '@/views/AccountView.vue'
-import AppBar from '@/components/AppBar.vue'
+import CartView from '@/views/CartView.vue'
+import HomeView from '@/views/HomeView.vue'
 import ListProductsView from '@/views/ListProductsView.vue'
+import LoginView from '@/views/LoginView.vue'
+import MyDetailView from '@/views/MyDetailView.vue'
+import OrderView from '@/views/OrderView.vue'
+import ProductDetailView from '@/views/ProductDetailView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      component: AppBar,
+      component: NavBar,
       children: [
         {
           path: '/',
@@ -35,25 +39,39 @@ const router = createRouter({
           component: UserInfo
         },
         {
-          path: '/account',
-          name: 'account',
-          component: AccountView
-        },
-        {
-          path: '/list_products',
+          path: '/products',
           name: 'products',
           component: ListProductsView
+        },
+        {
+          path: '/product',
+          name: 'product_detail',
+          component: ProductDetailView
+        },
+        {
+          path: '/cart',
+          name: 'cart',
+          component: CartView
+        },
+        {
+          path: '/account',
+          name: 'account',
+          component: AccountView,
+          children: [
+            {
+              path: 'order',
+              name: 'order',
+              component: OrderView
+            },
+            {
+              path: 'my-details',
+              name: 'my_details',
+              component: MyDetailView
+            }
+          ]
         }
       ]
     }
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
   ]
 })
 

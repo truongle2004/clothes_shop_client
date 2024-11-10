@@ -1,161 +1,139 @@
 <script setup>
-import { ref } from 'vue'
 import ListProductsView from '@/views/ListProductsView.vue'
+import { computed, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import priceFormatter from '@/utils/formatPrice'
 
 const widthListCard = '400px'
+const store = useStore()
 
-const listCover = [
-  ' https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-1-white?$n_320w$&wid=317&fit=constrain ',
-  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-2?$n_320w$&wid=317&fit=constrain',
-  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-3?$n_320w$&wid=317&fit=constrain',
-  'https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-4?$n_320w$&wid=317&fit=constrain'
-]
+const productDetail = computed(() => store.getters['product/selectedProduct'])
+const listCover = computed(() => productDetail.value?.images || [])
+const selectedImage = ref(listCover.value[0]?.url || '')
+const quantity = ref(1)
 
-const showProductDetailInfo = ref(false)
-const showBrandDetailInfo = ref(false)
-const showAboutMeInfo = ref(false)
+watch(
+  listCover,
+  (newList) => {
+    if (newList.length > 0) {
+      selectedImage.value = newList[0].url
+    }
+  },
+  { immediate: true }
+)
 
-const selectedImage = ref(listCover[0])
-
-const handleClickProductDetailBtn = () => {
-  showProductDetailInfo.value = !showProductDetailInfo.value
+const handleIncrement = () => {
+  quantity.value++
 }
 
-const handleClickBrandDetailBtn = () => {
-  showBrandDetailInfo.value = !showBrandDetailInfo.value
-}
-
-const handleClickShowAboutMeBtn = () => {
-  showAboutMeInfo.value = !showAboutMeInfo.value
+const handleDecrement = () => {
+  if (quantity.value > 1) {
+    quantity.value--
+  }
 }
 
 const handleSelectImage = (index) => {
-  selectedImage.value = listCover[index]
+  selectedImage.value = listCover.value[index]?.url || ''
 }
+
+const formattedPrice = computed(() => {
+  const price = productDetail.value?.price || 0
+  return priceFormatter.format(price)
+})
 </script>
 
 <template>
-  <div class="container d-flex gap-4">
-    <div class="side-left d-flex gap-3">
-      <div class="left-gallery d-flex flex-column gap-2">
+  <div class="container">
+    <div class="side-left">
+      <div class="left-gallery">
         <img
-          class="img-thumbnail"
-          alt="Gallery Image"
           v-for="(image, index) in listCover"
-          :key="index"
-          :src="image"
+          :key="image.id"
+          class="img-thumbnail"
+          :src="image.url"
+          :alt="image.alt"
           @click="handleSelectImage(index)"
         />
       </div>
       <div class="swiper-images">
-        <img class="img-fluid" :src="selectedImage" alt="Main Gallery Image" />
+        <img class="img-fluid" :src="selectedImage" />
       </div>
     </div>
-    <div class="side-right d-flex flex-column gap-2">
-      <h3 class="header-title">Topshop Heidi Knitted Headscarf in Cream</h3>
-      <div class="price">£100.00</div>
-      <div class="color">
-        <strong>Size:</strong>
-        <p>One size</p>
+    <div class="side-right">
+      <h3 class="header-title">{{ productDetail?.name }}</h3>
+      <div class="d-flex">
+        <div class="price">{{ formattedPrice }}</div>
+        <div class="currency">{{ productDetail?.currency }}</div>
       </div>
-      <div>
+      <div v-if="productDetail?.sizes" class="sizes">
+        <button
+          v-for="(size, index) in productDetail.sizes"
+          :key="index"
+          class="btn-size btn btn-outline-primary"
+        >
+          {{ size.name }}
+        </button>
+      </div>
+      <div class="quantity d-flex gap-3 align-items-center">
+        <button type="button" class="btn btn-outline-secondary btn-sm" @click="handleIncrement">
+          +
+        </button>
+        <span class="quantity-value">{{ quantity }}</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" @click="handleDecrement">
+          -
+        </button>
+      </div>
+      <div class="d-flex">
         <button type="button" class="btn btn-success w-100">Add to Bag</button>
+        <button class="btn btn-outline-secondary w-100">Buy now</button>
       </div>
-      <div>
-        <button type="button" class="btn btn-light w-100" @click="handleClickProductDetailBtn">
-          Product Details
-        </button>
-
-        <div class="list-describe-product-detail" v-show="showProductDetailInfo">
-          <div class="product-describer">
-            <div class="d-flex flex-row gap-1">
-              <p class="name-product">Accessories</p>
-              <p>by</p>
-              <p class="brand-product">Topshop</p>
-            </div>
-          </div>
-          <ul>
-            <li>This is Topshop</li>
-            <li>Plain Design</li>
-            <li>Tie fastening</li>
-          </ul>
-        </div>
-      </div>
-      <div>
-        <button type="button" class="btn btn-light w-100" @click="handleClickBrandDetailBtn">
-          Brand
-        </button>
-        <div class="list-describe-product-detail" v-show="showBrandDetailInfo">
-          <div class="brand-description">
-            <p>
-              <strong> TopShop </strong>
-              is entering a new era. Retaining its fashion authority and the very best of its
-              heritage, while celebrating iconic styles such as the Jamie and Joni jean, and
-              embracing the new. With that unique London spirit remaining at the core of the
-              collections, join us on a journey of exploration and discovery. Shop the entire range
-              only at ASOS in petite, maternity, tall and curve edits and expect dresses, tops,
-              tailoring and shoes.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <button type="button" class="btn btn-light w-100" @click="handleClickShowAboutMeBtn">
-          About Me
-        </button>
-        <div class="about-me-description" v-show="showAboutMeInfo">
-          <p>Jersey: soft and stretchy</p>
-          <p>Main: 100% cotton</p>
-        </div>
-      </div>
+      <ul v-if="productDetail?.features">
+        <li v-for="feature in productDetail.features" :key="feature.id">
+          {{ feature.description }}
+        </li>
+      </ul>
     </div>
   </div>
-  <div>
-    <strong>
-      <h4 style="margin-top: 2rem; margin-left: 5rem; font-weight: bold">YOU MIGHT ALSO LIKE</h4>
-    </strong>
+  <div class="recommendations">
+    <h4>YOU MIGHT ALSO LIKE</h4>
+    <ListProductsView :card-width="widthListCard" />
   </div>
-  <ListProductsView :card-width="widthListCard" />
 </template>
 
 <style scoped lang="scss">
 .container {
   display: flex;
+  gap: 4rem;
   flex-direction: row;
-  align-items: flex-start;
-}
-
-.product-describer {
-  .name-product,
-  .brand-product {
-    text-decoration: underline !important;
-  }
-}
-
-.brand-description {
-  font-size: 0.875rem;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  width: 500px;
-  strong {
-    text-decoration: underline;
-  }
 }
 
 .side-left {
-  .img-thumbnail {
-    width: 100px;
-    height: auto;
-    margin-bottom: 0.5rem;
+  display: flex;
+  gap: 1rem;
+
+  .left-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .img-thumbnail {
+      width: 100px;
+      cursor: pointer;
+    }
   }
 
-  .swiper-images .img-fluid {
-    width: 516px;
-    height: auto;
+  .swiper-images {
+    .img-fluid {
+      width: 516px;
+    }
   }
 }
 
 .side-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
   .header-title {
     font-weight: bold;
     margin-bottom: 0.5rem;
@@ -165,7 +143,29 @@ const handleSelectImage = (index) => {
     font-size: 1.25rem;
     font-weight: bold;
     color: #333;
-    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .sizes {
+    display: flex;
+    gap: 0.5rem;
+
+    .btn-size {
+      padding: 0.25rem 0.75rem;
+    }
+  }
+
+  .list-describe-product-detail {
+    margin-top: 1rem;
+  }
+}
+
+.recommendations {
+  margin-top: 2rem;
+  margin-left: 5rem;
+  font-weight: bold;
+  h4 {
+    margin: 0;
   }
 }
 </style>

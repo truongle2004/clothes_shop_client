@@ -1,5 +1,5 @@
 <script setup>
-import { userApi } from '@/apis/UserApi'
+import { userApi } from '@/apis/userApi'
 import router from '@/router'
 import { useMutation } from '@tanstack/vue-query'
 import { reactive } from 'vue'

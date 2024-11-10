@@ -1,8 +1,21 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
+import priceFormatter from '@/utils/formatPrice'
 
 const router = useRouter()
+
+const props = defineProps({
+  product: Object
+})
+
+// Define a constant for the number format with thousands separator
+
+// Format the price using the constant
+const formattedPrice = computed(() => {
+  const price = props.product?.price || 0
+  return priceFormatter.format(price)
+})
 
 const handleClick = () => {
   router.push({
@@ -13,66 +26,50 @@ const handleClick = () => {
 const cardWidth = computed(() => {
   return router.currentRoute.value.name === 'product_detail' ? '200px' : '318px'
 })
+
+// Directly use computed property to handle the image source, falling back if necessary
+const imageSrc = computed(
+  () =>
+    props.product?.image.url ||
+    'https://product.hstatic.net/1000197303/product/pro_hoa_02_1_24d1ab2b185a451ca67be9ac96b7af27.jpg'
+)
 </script>
 
 <template>
-  <div class="product-container" @click="handleClick" :style="{ maxWidth: cardWidth }">
-    <img
-      src="https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-1-white?$n_640w$&wid=513&fit=constrain"
-      alt="Tab Belted Twill Car Coat"
-      class="product-image"
-    />
-    <div class="info">
-      <div class="title">
-        <p>Tab Belted Twill Car Coat</p>
-      </div>
-      <div class="price">
-        <strong>
-          <p>£100.00</p>
-        </strong>
+  <div
+    class="card p-3 m-2 d-flex flex-column justify-content-between shadow-sm border-0"
+    @click="handleClick"
+    :style="{ maxWidth: cardWidth }"
+  >
+    <!-- Render the image based on computed property for image source -->
+    <img :src="imageSrc" class="card-img-top" alt="Product Image" />
+    <div class="card-body d-flex flex-column justify-content-between">
+      <h5 class="card-title">{{ product?.name }}</h5>
+      <div class="d-flex align-items-center">
+        <div class="price">
+          <strong>
+            <p class="mb-0">{{ formattedPrice }}</p>
+          </strong>
+        </div>
+        <div class="currency">
+          <p class="mb-0">{{ product?.currency }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.product-container {
-  display: flex;
-  flex-direction: column;
-  margin: 10px;
-  border-radius: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-  flex: 1 1 calc(25% - 40px);
-  // max-width: 318px;
-  transition: box-shadow 0.3s ease-in-out;
-
-  &:hover {
-    box-shadow:
-      rgba(0, 0, 0, 0.25) 0px 54px 55px,
-      rgba(0, 0, 0, 0.12) 0px -12px 30px,
-      rgba(0, 0, 0, 0.12) 0px 4px 6px,
-      rgba(0, 0, 0, 0.17) 0px 12px 13px,
-      rgba(0, 0, 0, 0.09) 0px -3px 5px;
-  }
+.card-img-top {
+  object-fit: cover;
+  border-radius: 0.25rem;
 }
 
-.product-image {
-  width: 100%;
-  height: auto;
+.card-body {
+  padding: 0.75rem;
 }
 
-.info {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.title p,
 .price p {
-  margin-bottom: 0;
-  padding: 2px 15px;
+  font-weight: bold;
 }
 </style>

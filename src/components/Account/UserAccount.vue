@@ -1,7 +1,6 @@
 <script setup>
 import AvatarAccount from './Avatar/AvatarAccount.vue'
 import SidebarMenu from './Sidebar/SidebarMenu.vue'
-import SidebarContent from './Sidebar/SidebarContent.vue'
 </script>
 
 <template>
@@ -15,12 +14,19 @@ import SidebarContent from './Sidebar/SidebarContent.vue'
       </div>
     </div>
 
-    <div style="width: 500px">
-      <SidebarContent />
+    <div class="container-side-content">
+      <router-view />
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Add custom styles if necessary */
+.container-side-content {
+  width: 500px;
+  padding: 20px;
+  background-color: #f0f8ff;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 </style>

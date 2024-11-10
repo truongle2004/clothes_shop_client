@@ -1,12 +1,12 @@
 <script setup>
-import { userApi } from '@/apis/UserApi'
+import { userApi } from '@/apis/userApi'
 import { useMutation } from '@tanstack/vue-query'
 import { reactive, ref } from 'vue'
 
 // TODO: create useMutation hook
 // TODO: set user info after returning from API
 
-const errorMessage = ref(null)
+// const errorMessage = ref(null)
 
 const form = reactive({
   firstName: '',
@@ -23,9 +23,9 @@ const validateForm = () => {
   return true
 }
 
-const { isPending, mutate } = useMutation({
-  mutationFn: userApi.addInfoApi
-})
+// const { isPending, mutate } = useMutation({
+//   mutationFn: userApi.addInfoApi
+// })
 </script>
 
 <template>
@@ -103,16 +103,6 @@ const { isPending, mutate } = useMutation({
 </template>
 
 <style scoped>
-.container {
-  width: 500px;
-  padding: 20px;
-  background-color: #f0f8ff;
-  height: auto;
-  /* margin: 0 auto; */
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 h3 {
   margin-bottom: 20px;
 }
