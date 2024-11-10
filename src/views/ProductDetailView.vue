@@ -3,10 +3,16 @@ import ListProductsView from '@/views/ListProductsView.vue'
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import priceFormatter from '@/utils/formatPrice'
+import { getProductId, saveProductId } from '@/utils/localStorageHelper'
+import { useRoute } from 'vue-router'
+import { onBeforeMount } from 'vue'
+import ListProduct from '@/components/ListProduct.vue'
 
 const widthListCard = '400px'
 const store = useStore()
+const route = useRoute()
 
+const productId = ref(getProductId())
 const productDetail = computed(() => store.getters['product/selectedProduct'])
 const listCover = computed(() => productDetail.value?.images || [])
 const selectedImage = ref(listCover.value[0]?.url || '')
@@ -20,6 +26,20 @@ watch(
     }
   },
   { immediate: true }
+)
+
+onBeforeMount(() => {
+  store.dispatch('product/fetchProductById', route.params.id)
+})
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      productId.value = route.params.id
+      saveProductId(newId)
+    }
+  }
 )
 
 const handleIncrement = () => {
@@ -96,7 +116,7 @@ const formattedPrice = computed(() => {
   </div>
   <div class="recommendations">
     <h4>YOU MIGHT ALSO LIKE</h4>
-    <ListProductsView :card-width="widthListCard" />
+    <ListProduct :card-width="widthListCard" />
   </div>
 </template>
 

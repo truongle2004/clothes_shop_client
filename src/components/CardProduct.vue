@@ -17,12 +17,12 @@ const formattedPrice = computed(() => {
   return priceFormatter.format(price)
 })
 
-const handleClick = () => {
-  router.push({
-    name: 'product_detail'
-  })
-}
-
+// const handleClick = () => {
+//   router.push({
+//     name: 'product_detail'
+//   })
+// }
+//
 const cardWidth = computed(() => {
   return router.currentRoute.value.name === 'product_detail' ? '200px' : '318px'
 })
@@ -38,7 +38,6 @@ const imageSrc = computed(
 <template>
   <div
     class="card p-3 m-2 d-flex flex-column justify-content-between shadow-sm border-0"
-    @click="handleClick"
     :style="{ maxWidth: cardWidth }"
   >
     <!-- Render the image based on computed property for image source -->

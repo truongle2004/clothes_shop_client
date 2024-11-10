@@ -44,9 +44,10 @@ const router = createRouter({
           component: ListProductsView
         },
         {
-          path: '/product',
+          path: '/product/:id/:slug',
           name: 'product_detail',
-          component: ProductDetailView
+          component: ProductDetailView,
+          props: true
         },
         {
           path: '/cart',
