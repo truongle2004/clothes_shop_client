@@ -1,16 +1,28 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
-import priceFormatter from '@/utils/formatPrice'
 import ListProduct from '@/components/ListProduct.vue'
+import priceFormatter from '@/utils/formatPrice'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 const widthListCard = '400px'
 const store = useStore()
+const router = useRouter()
 
 const productDetail = computed(() => store.getters['product/selectedProduct'])
 const listCover = computed(() => productDetail.value?.images || [])
 const selectedImage = ref(listCover.value[0]?.url || '')
 const quantity = ref(1)
+
+const productId = localStorage.getItem('selectedProductId')
+
+const fetchProduct = () => {
+  if (productId) {
+    store.dispatch('product/fetchProductById', productId)
+  } else {
+    router.push({ name: 'home' })
+  }
+}
 
 watch(
   listCover,
@@ -21,10 +33,6 @@ watch(
   },
   { immediate: true }
 )
-
-// onBeforeMount(() => {
-//   store.dispatch('product/fetchProductById', getProductId())
-// })
 
 const handleIncrement = () => {
   quantity.value++
@@ -40,20 +48,30 @@ const handleSelectImage = (index) => {
   selectedImage.value = listCover.value[index]?.url || ''
 }
 
+const handleBuyNow = () => {}
+
+const handleAddToBag = () => {}
+
 const formattedPrice = computed(() => {
   const price = productDetail.value?.price || 0
   return priceFormatter.format(price)
 })
+
+onMounted(() => {
+  if (!productDetail.value) {
+    fetchProduct()
+  }
+})
 </script>
 
 <template>
-  <div class="container">
-    <div class="side-left">
-      <div class="left-gallery">
+  <div class="container d-flex gap-4 flex-row">
+    <div class="side-left d-flex gap-3">
+      <div class="left-gallery d-flex flex-column gap-1">
         <img
           v-for="(image, index) in listCover"
           :key="image.id"
-          class="img-thumbnail"
+          class="img-thumbnail cursor-pointer"
           :src="image.url"
           :alt="image.alt"
           @click="handleSelectImage(index)"
@@ -89,7 +107,7 @@ const formattedPrice = computed(() => {
       </div>
       <div class="d-flex">
         <button type="button" class="btn btn-success w-100">Add to Bag</button>
-        <button class="btn btn-outline-secondary w-100">Buy now</button>
+        <button class="btn btn-outline-secondary w-100" @click="handleBuyNow">Buy now</button>
       </div>
       <ul v-if="productDetail?.features">
         <li v-for="feature in productDetail.features" :key="feature.id">
@@ -105,32 +123,12 @@ const formattedPrice = computed(() => {
 </template>
 
 <style scoped lang="scss">
-.container {
-  display: flex;
-  gap: 4rem;
-  flex-direction: row;
+.img-thumbnail {
+  width: 100px;
 }
 
-.side-left {
-  display: flex;
-  gap: 1rem;
-
-  .left-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    .img-thumbnail {
-      width: 100px;
-      cursor: pointer;
-    }
-  }
-
-  .swiper-images {
-    .img-fluid {
-      width: 516px;
-    }
-  }
+.img-fluid {
+  width: 516px;
 }
 
 .side-right {

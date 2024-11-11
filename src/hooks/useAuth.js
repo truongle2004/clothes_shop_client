@@ -9,8 +9,16 @@ export const useAuth = () => {
 
   const getUserInfo = () => userInfo
 
+  const clearUserInfo = () => {
+    userInfo.value = {}
+  }
+
+  const isAuthenticated = () => !!userInfo.value
+
   return {
     setUserInfo,
-    getUserInfo
+    getUserInfo,
+    clearUserInfo,
+    isAuthenticated
   }
 }

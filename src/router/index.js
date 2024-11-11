@@ -1,14 +1,3 @@
-import NavBar from '@/components/NavBar.vue'
-import UserInfo from '@/components/Form/UserInfo/UserInfo.vue'
-import AccountView from '@/views/AccountView.vue'
-import CartView from '@/views/CartView.vue'
-import HomeView from '@/views/HomeView.vue'
-import ListProductsView from '@/views/ListProductsView.vue'
-import LoginView from '@/views/LoginView.vue'
-import MyDetailView from '@/views/MyDetailView.vue'
-import OrderView from '@/views/OrderView.vue'
-import ProductDetailView from '@/views/ProductDetailView.vue'
-import RegisterView from '@/views/RegisterView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -16,58 +5,58 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: NavBar,
+      component: () => import('@/components/NavBar.vue'),
       children: [
         {
           path: '/',
           name: 'home',
-          component: HomeView
+          component: () => import('@/views/HomeView.vue')
         },
         {
           path: '/login',
           name: 'login',
-          component: LoginView
+          component: () => import('@/views/LoginView.vue')
         },
         {
           path: '/register',
           name: 'register',
-          component: RegisterView
+          component: () => import('@/views/RegisterView.vue')
         },
         {
           path: '/userInfo',
           name: 'userInfo',
-          component: UserInfo
+          component: () => import('@/components/Form/UserInfo/UserInfo.vue')
         },
         {
           path: '/products',
           name: 'products',
-          component: ListProductsView
+          component: () => import('@/views/ListProductsView.vue')
         },
         {
           path: '/product/:id/:slug',
           name: 'product_detail',
-          component: ProductDetailView,
+          component: () => import('@/views/ProductDetailView.vue'),
           props: true
         },
         {
           path: '/cart',
           name: 'cart',
-          component: CartView
+          component: () => import('@/views/CartView.vue')
         },
         {
           path: '/account',
           name: 'account',
-          component: AccountView,
+          component: () => import('@/views/AccountView.vue'),
           children: [
             {
               path: 'order',
               name: 'order',
-              component: OrderView
+              component: () => import('@/views/OrderView.vue')
             },
             {
               path: 'my-details',
               name: 'my_details',
-              component: MyDetailView
+              component: () => import('@/views/MyDetailView.vue')
             }
           ]
         }
@@ -77,6 +66,17 @@ const router = createRouter({
   scrollBehavior() {
     return { top: 0 }
   }
+})
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('accessToken')
+  const protectedRoutes = ['account', 'order', 'my_details', 'cart']
+
+  if (!isAuthenticated && protectedRoutes.includes(to.name)) {
+    return next({ name: 'login' })
+  }
+
+  next()
 })
 
 export default router

@@ -17,7 +17,9 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => {
     const { accessToken } = response.data
-    console.log(accessToken)
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken)
+    }
     if (accessToken) {
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
     }

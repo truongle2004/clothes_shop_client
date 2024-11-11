@@ -23,7 +23,7 @@ const handleOnSuccess = (data) => {
   const { user } = data
   setUserInfo(user)
   router.push({
-    path: '/list_products'
+    path: '/products'
   })
 }
 
