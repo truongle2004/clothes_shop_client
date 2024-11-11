@@ -1,3 +1,5 @@
+import { toastifyError } from '@/utils/toastify'
+import ListProductsView from '@/views/ListProductsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -31,6 +33,7 @@ const router = createRouter({
           path: '/products',
           name: 'products',
           component: () => import('@/views/ListProductsView.vue')
+          //component: ListProductsView
         },
         {
           path: '/product/:id/:slug',
@@ -73,6 +76,7 @@ router.beforeEach((to, from, next) => {
   const protectedRoutes = ['account', 'order', 'my_details', 'cart']
 
   if (!isAuthenticated && protectedRoutes.includes(to.name)) {
+    toastifyError('You need to login first')
     return next({ name: 'login' })
   }
 

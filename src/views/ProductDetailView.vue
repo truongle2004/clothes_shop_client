@@ -1,6 +1,11 @@
 <script setup>
+import { productApis } from '@/apis/productApi'
 import ListProduct from '@/components/ListProduct.vue'
+import { useAuth } from '@/hooks/useAuth'
 import priceFormatter from '@/utils/formatPrice'
+import { getProductId } from '@/utils/localStorageHelper'
+import { toastifyError, toastifySuccess, toastifyWarning } from '@/utils/toastify'
+import { useMutation } from '@tanstack/vue-query'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -11,14 +16,41 @@ const router = useRouter()
 
 const productDetail = computed(() => store.getters['product/selectedProduct'])
 const listCover = computed(() => productDetail.value?.images || [])
-const selectedImage = ref(listCover.value[0]?.url || '')
-const quantity = ref(1)
 
-const productId = localStorage.getItem('selectedProductId')
+const selectedImage = ref(listCover.value[0]?.url || '')
+
+const selectedQuantity = ref(1)
+
+const selectedSize = ref(null)
+
+const errorMessage = ref(null)
+
+const { isAuthenticated, getUserInfo } = useAuth()
+
+const productId = ref(getProductId())
+
+const { mutate, isPending } = useMutation({
+  mutationFn: productApis.addProductToCart
+})
+
+const handleOnError = (error) => {
+  if (error.response && error.response.data && error.response.data.message) {
+    errorMessage.value = error.response.data.message
+  } else if (error.message) {
+    errorMessage.value = error.message
+  } else {
+    errorMessage.value = 'An unknown error occurred.'
+  }
+}
+
+const handleSuccess = (data) => {
+  const { message } = data
+  toastifySuccess(message)
+}
 
 const fetchProduct = () => {
-  if (productId) {
-    store.dispatch('product/fetchProductById', productId)
+  if (productId.value) {
+    store.dispatch('product/fetchProductById', productId.value)
   } else {
     router.push({ name: 'home' })
   }
@@ -35,12 +67,12 @@ watch(
 )
 
 const handleIncrement = () => {
-  quantity.value++
+  selectedQuantity.value++
 }
 
 const handleDecrement = () => {
-  if (quantity.value > 1) {
-    quantity.value--
+  if (selectedQuantity.value > 1) {
+    selectedQuantity.value--
   }
 }
 
@@ -50,7 +82,26 @@ const handleSelectImage = (index) => {
 
 const handleBuyNow = () => {}
 
-const handleAddToBag = () => {}
+const handleAddToBag = () => {
+  if (!isAuthenticated) {
+    toastifyError('Please login first!')
+  } else {
+    if (!selectedSize.value) {
+      toastifyWarning('Please select size!')
+    }
+
+    const userId = getUserInfo()?.id
+
+    mutate(productId, selectedQuantity.value, selectedSize.value, userId, {
+      onSuccess: handleSuccess,
+      onError: handleOnError
+    })
+  }
+}
+
+const handleSelectSize = (size) => {
+  selectedSize.value = size
+}
 
 const formattedPrice = computed(() => {
   const price = productDetail.value?.price || 0
@@ -92,6 +143,7 @@ onMounted(() => {
           v-for="(size, index) in productDetail.sizes"
           :key="index"
           class="btn-size btn btn-outline-primary"
+          @click="handleSelectSize(size.id)"
         >
           {{ size.name }}
         </button>
@@ -100,13 +152,16 @@ onMounted(() => {
         <button type="button" class="btn btn-outline-secondary btn-sm" @click="handleIncrement">
           +
         </button>
-        <span class="quantity-value">{{ quantity }}</span>
+        <span class="quantity-value">{{ selectedQuantity }}</span>
         <button type="button" class="btn btn-outline-secondary btn-sm" @click="handleDecrement">
           -
         </button>
       </div>
       <div class="d-flex">
-        <button type="button" class="btn btn-success w-100">Add to Bag</button>
+        <button type="button" class="btn btn-success w-100" @click="handleAddToBag">
+          <span v-if="isPending">Adding...</span>
+          <span v-else>Add to bag</span>
+        </button>
         <button class="btn btn-outline-secondary w-100" @click="handleBuyNow">Buy now</button>
       </div>
       <ul v-if="productDetail?.features">

@@ -3,8 +3,10 @@ import { userApi } from '@/apis/userApi'
 import router from '@/router'
 import { useMutation } from '@tanstack/vue-query'
 import { reactive } from 'vue'
-import { useAuth } from '@/hooks/useAuth'
 import { ref } from 'vue'
+import { toastifySuccess } from '@/utils/toastify'
+import { useAuth } from '@/hooks/useAuth'
+import { tokenDecoded } from '@/utils/tokenDecoded'
 
 const errorMessage = ref(null)
 
@@ -20,8 +22,12 @@ const { isPending, mutate } = useMutation({
 const { setUserInfo } = useAuth()
 
 const handleOnSuccess = (data) => {
-  const { user } = data
-  setUserInfo(user)
+  const { message, accessToken } = data
+
+  setUserInfo(tokenDecoded(accessToken))
+
+  toastifySuccess(message)
+
   router.push({
     path: '/products'
   })

@@ -13,7 +13,7 @@ export const useAuth = () => {
     userInfo.value = {}
   }
 
-  const isAuthenticated = () => !!userInfo.value
+  const isAuthenticated = () => !!localStorage.getItem('access_token')
 
   return {
     setUserInfo,
