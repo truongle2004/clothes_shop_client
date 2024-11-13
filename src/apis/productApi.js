@@ -9,12 +9,12 @@ const getProductById = async (id) => {
   return await axiosInstance.get(`${PRODUCT_URL}/${id}`)
 }
 
-const addProductToCart = async (productId, quantity, size, price, userId) => {
-  return await axiosInstance.post(`${CART_URL}/${userId}`, {
-    productId,
-    quantity,
-    size,
-    price
+const addProductToCart = async (props) => {
+  return await axiosInstance.post(`${CART_URL}/${props.userId}`, {
+    productId: props.productId,
+    quantity: props.quantity,
+    price: props.price,
+    size: props.size
   })
 }
 

@@ -1,10 +1,10 @@
 <script setup>
 import { productApis } from '@/apis/productApi'
 import ListProduct from '@/components/ListProduct.vue'
-import { useAuth } from '@/hooks/useAuth'
 import priceFormatter from '@/utils/formatPrice'
 import { getProductId } from '@/utils/localStorageHelper'
-import { toastifyError, toastifySuccess, toastifyWarning } from '@/utils/toastify'
+import { toastifyError, toastifySuccess } from '@/utils/toastify'
+import { tokenDecoded } from '@/utils/tokenDecoded'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -24,8 +24,6 @@ const selectedQuantity = ref(1)
 const selectedSize = ref(null)
 
 const errorMessage = ref(null)
-
-const { isAuthenticated, getUserInfo } = useAuth()
 
 const productId = ref(getProductId())
 
@@ -83,19 +81,34 @@ const handleSelectImage = (index) => {
 const handleBuyNow = () => {}
 
 const handleAddToBag = () => {
-  if (!isAuthenticated) {
-    toastifyError('Please login first!')
-  } else {
-    if (!selectedSize.value) {
-      toastifyWarning('Please select size!')
+  if (selectedSize.value === null) {
+    toastifyError('Please select size')
+  }
+  if (productId.value && selectedQuantity.value && selectedSize.value) {
+    // TODO: storing in memory
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      const userInfo = tokenDecoded(token)
+      const cartData = {
+        productId: productId.value,
+        quantity: selectedQuantity.value,
+        price: productDetail.value?.price,
+        size: selectedSize.value,
+        userId: userInfo?.id
+      }
+
+      console.log('cardData', cartData)
+
+      mutate(cartData, {
+        onSuccess: handleSuccess,
+        onError: handleOnError
+      })
+    } else {
+      toastifyError('You need to login first')
+      router.push({ name: 'login' })
     }
-
-    const userId = getUserInfo()?.id
-
-    mutate(productId, selectedQuantity.value, selectedSize.value, userId, {
-      onSuccess: handleSuccess,
-      onError: handleOnError
-    })
+  } else {
+    console.warn('Missing required data for adding product to cart')
   }
 }
 
@@ -143,6 +156,7 @@ onMounted(() => {
           v-for="(size, index) in productDetail.sizes"
           :key="index"
           class="btn-size btn btn-outline-primary"
+          :class="{ 'btn-selected': selectedSize === size.id }"
           @click="handleSelectSize(size.id)"
         >
           {{ size.name }}
@@ -224,5 +238,11 @@ onMounted(() => {
   h4 {
     margin: 0;
   }
+}
+
+.btn-selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
 }
 </style>
