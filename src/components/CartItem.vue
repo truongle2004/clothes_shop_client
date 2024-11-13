@@ -25,10 +25,11 @@ const formattedPrice = computed(() => priceFormatter.format(props.item.price))
 
 const handleCheckBox = (e) => {
   const isSelected = e.target.checked
-  store.commit(
-    isSelected ? 'cart/setSelectedCartItem' : 'cart/removeSelectedCartItem',
-    props.item.id
-  )
+  if (isSelected) {
+    store.dispatch('cart/AddCartItem', props.item)
+  } else {
+    store.dispatch('cart/RemoveCartItem', props.item.id)
+  }
 }
 </script>
 

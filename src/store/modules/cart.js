@@ -1,10 +1,11 @@
 const state = {
-  selectedProduct: []
+  selectedItem: []
 }
 
 const mutations = {
   setSelectedCartItem(state, product) {
-    state.selectedProduct = product
+    state.selectedItem.push(product)
+    console.log(state.selectedItem)
   },
   removeCartItemSelected(state, id) {
     state.selectedProduct = state.selectedProduct.filter((item) => item.id !== id)
@@ -22,7 +23,7 @@ const actions = {
 
 const getters = {
   selectedCartItem: (state) => state.selectedProduct,
-  getTotalPrice: (state) => state.selectedProduct.reduce((total, item) => total + item.price, 0)
+  totalPrice: (state) => state.selectedProduct.reduce((total, item) => total + item.price, 0)
 }
 
 export default {
