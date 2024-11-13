@@ -24,6 +24,11 @@ const { setUserInfo } = useAuth()
 const handleOnSuccess = (data) => {
   const { message, accessToken } = data
 
+  if (accessToken) {
+    const userId = tokenDecoded(accessToken)?.id
+    localStorage.setItem('userId', userId)
+  }
+
   setUserInfo(tokenDecoded(accessToken))
 
   toastifySuccess(message)

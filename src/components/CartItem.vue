@@ -1,7 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
+import priceFormatter from '@/utils/formatPrice'
 
-const quantity = ref(0)
+const props = defineProps({
+  item: {
+    type: Object,
+    required: true
+  }
+})
+
+const store = useStore()
+const quantity = ref(props.item.quantity)
 
 const increaseQuantity = () => {
   quantity.value++
@@ -10,29 +20,39 @@ const increaseQuantity = () => {
 const decreaseQuantity = () => {
   if (quantity.value > 0) quantity.value--
 }
+
+const formattedPrice = computed(() => priceFormatter.format(props.item.price))
+
+const handleCheckBox = (e) => {
+  const isSelected = e.target.checked
+  store.commit(
+    isSelected ? 'cart/setSelectedCartItem' : 'cart/removeSelectedCartItem',
+    props.item.id
+  )
+}
 </script>
 
 <template>
-  <div class="d-flex gap-3">
+  <div class="product d-flex gap-3">
     <div class="product-image">
-      <img
-        src="https://images.asos-media.com/products/topshop-oversized-drop-shoulder-tee-in-white/205435563-1-white"
-        class="img-fluid"
-      />
+      <img :src="props.item.image?.url" alt="Product image" class="img-fluid" />
     </div>
     <div class="product-info">
-      <div class="price text-danger fw-bold">£12.75</div>
-      <div class="description text-muted">Topshop oversized drop shoulder tee in white</div>
-      <div class="d-flex align-items-center gap-3 mt-2">
-        <span class="text-secondary">Color: WHITE</span>
+      <input class="form-check-input" type="checkbox" @change="handleCheckBox" />
+      <div class="product-details">
+        <span class="price text-danger fw-bold">{{ formattedPrice }}</span>
+        <span class="currency">{{ props.item.currency }}</span>
+        <p class="description text-muted">{{ props.item.name }}</p>
+      </div>
+      <div class="product-options d-flex align-items-center gap-3 mt-2">
         <div class="dropdown">
           <button
-            class="btn btn-outline-secondary dropdown-toggle"
+            class="btn btn-outline-secondary dropdown-toggle btn-sm"
             type="button"
             data-bs-toggle="dropdown"
-            aria-expanded="false"
+            :aria-label="`Select size for ${props.item.name}`"
           >
-            Select Size
+            {{ props.item.size?.name }}
           </button>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item">XS</a></li>
@@ -41,10 +61,10 @@ const decreaseQuantity = () => {
             <li><a class="dropdown-item">L</a></li>
           </ul>
         </div>
-        <div class="d-flex align-items-center gap-2">
-          <button @click="decreaseQuantity" class="btn btn-outline-secondary">-</button>
+        <div class="quantity-controls d-flex align-items-center gap-2">
+          <button @click="decreaseQuantity" class="btn btn-outline-secondary btn-sm">-</button>
           <span>{{ quantity }}</span>
-          <button @click="increaseQuantity" class="btn btn-outline-secondary">+</button>
+          <button @click="increaseQuantity" class="btn btn-outline-secondary btn-sm">+</button>
         </div>
       </div>
     </div>
@@ -54,5 +74,31 @@ const decreaseQuantity = () => {
 <style scoped>
 .product-image img {
   width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.product-details {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-basis: 100%;
+}
+
+.product-options {
+  flex-basis: 100%;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
 }
 </style>

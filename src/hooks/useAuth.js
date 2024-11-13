@@ -1,16 +1,23 @@
-import { ref } from 'vue'
+import { toastifyError } from '@/utils/toastify'
+import { reactive } from 'vue'
 
 export const useAuth = () => {
-  const userInfo = ref({})
+  const userInfo = reactive({})
 
   const setUserInfo = (newUserInfo) => {
-    userInfo.value = newUserInfo
+    Object.assign(userInfo, newUserInfo)
   }
 
-  const getUserInfo = () => userInfo
+  const getUserInfo = () => {
+    if (!Object.keys(userInfo).length) {
+      toastifyError('You are not logged in')
+      return null
+    }
+    return userInfo.value
+  }
 
   const clearUserInfo = () => {
-    userInfo.value = {}
+    Object.keys(userInfo).forEach((key) => delete userInfo[key])
   }
 
   const isAuthenticated = () => !!localStorage.getItem('access_token')

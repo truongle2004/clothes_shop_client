@@ -18,8 +18,13 @@ const addProductToCart = async (props) => {
   })
 }
 
+const getAllUserCart = async (id) => {
+  return await axiosInstance.get(`${CART_URL}/${id}`)
+}
+
 export const productApis = {
   getAllProductApi,
   getProductById,
-  addProductToCart
+  addProductToCart,
+  getAllUserCart
 }
