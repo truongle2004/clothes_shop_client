@@ -2,11 +2,19 @@
 import { productApis } from '@/apis/productApi'
 import CartItem from '@/components/CartItem.vue'
 import { useMutation } from '@tanstack/vue-query'
-import { reactive, onMounted } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
+import { useStore } from 'vuex'
+import priceFormatter from '@/utils/formatPrice'
 
 const cart = reactive({
   cartItems: []
 })
+
+const store = useStore()
+
+const totalPrice = computed(() => store.getters['cart/totalPrice'])
+
+const formattedPrice = computed(() => priceFormatter.format(totalPrice.value))
 
 const { mutate: fetchCartItems } = useMutation({
   mutationFn: productApis.getAllUserCart,
@@ -40,7 +48,7 @@ onMounted(() => {
           <h3 class="text-center mb-3">Total</h3>
           <div class="d-flex justify-content-between mb-3">
             <p>Subtotal:</p>
-            <p>£12.75</p>
+            <p>{{ formattedPrice }}</p>
           </div>
           <button class="btn btn-primary w-100">Buy</button>
         </div>

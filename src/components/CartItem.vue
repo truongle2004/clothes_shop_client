@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import priceFormatter from '@/utils/formatPrice'
 
+// TODO: remove hard code size name
+
 const props = defineProps({
   item: {
     type: Object,
@@ -10,7 +12,10 @@ const props = defineProps({
   }
 })
 
+const size = ref(props.item?.size?.name)
+
 const store = useStore()
+
 const quantity = ref(props.item.quantity)
 
 const increaseQuantity = () => {
@@ -26,10 +31,20 @@ const formattedPrice = computed(() => priceFormatter.format(props.item.price))
 const handleCheckBox = (e) => {
   const isSelected = e.target.checked
   if (isSelected) {
-    store.dispatch('cart/AddCartItem', props.item)
+    store.dispatch('cart/AddCartItem', {
+      ...props.item,
+      quantity: quantity.value
+    })
   } else {
-    store.dispatch('cart/RemoveCartItem', props.item.id)
+    store.dispatch('cart/RemoveCartItem', {
+      ...props.item,
+      quantity: quantity.value
+    })
   }
+}
+
+const handleChooseSize = (e) => {
+  size.value = e.target.innerText
 }
 </script>
 
@@ -53,13 +68,13 @@ const handleCheckBox = (e) => {
             data-bs-toggle="dropdown"
             :aria-label="`Select size for ${props.item.name}`"
           >
-            {{ props.item.size?.name }}
+            {{ size }}
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item">XS</a></li>
-            <li><a class="dropdown-item">S</a></li>
-            <li><a class="dropdown-item">M</a></li>
-            <li><a class="dropdown-item">L</a></li>
+            <li><a class="dropdown-item" @click="handleChooseSize">XS</a></li>
+            <li><a class="dropdown-item" @click="handleChooseSize">S</a></li>
+            <li><a class="dropdown-item" @click="handleChooseSize">M</a></li>
+            <li><a class="dropdown-item" @click="handleChooseSize">L</a></li>
           </ul>
         </div>
         <div class="quantity-controls d-flex align-items-center gap-2">

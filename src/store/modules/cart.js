@@ -1,14 +1,16 @@
 const state = {
-  selectedItem: []
+  selectedItems: [],
+  totalPrice: 0
 }
 
 const mutations = {
   setSelectedCartItem(state, product) {
-    state.selectedItem.push(product)
-    console.log(state.selectedItem)
+    state.selectedItems.push(product)
+    state.totalPrice += Number(product.price * product.quantity)
   },
-  removeCartItemSelected(state, id) {
-    state.selectedProduct = state.selectedProduct.filter((item) => item.id !== id)
+  removeCartItemSelected(state, product) {
+    state.selectedProduct = state.selectedItems.filter((item) => item.id !== product.productId)
+    state.totalPrice -= Number(product.price * product.quantity)
   }
 }
 
@@ -16,14 +18,14 @@ const actions = {
   AddCartItem({ commit }, cartItem) {
     commit('setSelectedCartItem', cartItem)
   },
-  RemoveCartItem({ commit }, cartItemId) {
-    commit('removeCartItemSelected', cartItemId)
+  RemoveCartItem({ commit }, cartItem) {
+    commit('removeCartItemSelected', cartItem)
   }
 }
 
 const getters = {
   selectedCartItem: (state) => state.selectedProduct,
-  totalPrice: (state) => state.selectedProduct.reduce((total, item) => total + item.price, 0)
+  totalPrice: (state) => state.totalPrice
 }
 
 export default {
