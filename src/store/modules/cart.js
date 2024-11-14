@@ -1,4 +1,5 @@
 const state = {
+  listCartItem: [],
   selectedItems: [],
   totalPrice: 0
 }
@@ -10,7 +11,13 @@ const mutations = {
   },
   removeCartItemSelected(state, product) {
     state.selectedProduct = state.selectedItems.filter((item) => item.id !== product.productId)
-    state.totalPrice -= Number(product.price * product.quantity)
+    if (state.totalPrice > 0) {
+      state.totalPrice -= Number(product.price * product.quantity)
+    }
+  },
+  setListCartItem(state, product) {
+    console.log(product)
+    state.listCartItem = product
   }
 }
 
@@ -20,12 +27,16 @@ const actions = {
   },
   RemoveCartItem({ commit }, cartItem) {
     commit('removeCartItemSelected', cartItem)
+  },
+  SetListCartItem({ commit }, listCartItem) {
+    commit('setListCartItem', listCartItem)
   }
 }
 
 const getters = {
   selectedCartItem: (state) => state.selectedProduct,
-  totalPrice: (state) => state.totalPrice
+  totalPrice: (state) => state.totalPrice,
+  listCartItem: (state) => state.listCartItem
 }
 
 export default {

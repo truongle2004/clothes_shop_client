@@ -2,13 +2,29 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import priceFormatter from '@/utils/formatPrice'
+import { useMutation } from '@tanstack/vue-query'
+import { productApis } from '@/apis/productApi'
+import { toastifyError, toastifySuccess } from '@/utils/toastify'
 
 // TODO: remove hard code size name
+// TODO: remove cart item
 
 const props = defineProps({
   item: {
     type: Object,
     required: true
+  }
+})
+
+const { mutate: RemoveItem } = useMutation({
+  mutationFn: productApis.removeCartItem,
+  onSuccess: (data) => {
+    const { message } = data
+    toastifySuccess(message)
+  },
+  onError: (data) => {
+    const { message } = data
+    toastifyError(message)
   }
 })
 
@@ -45,6 +61,12 @@ const handleCheckBox = (e) => {
 
 const handleChooseSize = (e) => {
   size.value = e.target.innerText
+}
+
+// TODO: when we remove item, we should also remove from cart in store which is selected before
+const handleRemoveItem = () => {
+  store.dispatch('cart/RemoveCartItem', props.item)
+  RemoveItem(props.item.id)
 }
 </script>
 
@@ -83,6 +105,9 @@ const handleChooseSize = (e) => {
           <button @click="increaseQuantity" class="btn btn-outline-secondary btn-sm">+</button>
         </div>
       </div>
+    </div>
+    <div>
+      <button class="btn btn-danger" @click="handleRemoveItem">Remove</button>
     </div>
   </div>
 </template>

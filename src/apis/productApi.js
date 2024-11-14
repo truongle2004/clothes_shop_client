@@ -22,9 +22,14 @@ const getAllUserCart = async (id) => {
   return await axiosInstance.get(`${CART_URL}/${id}`)
 }
 
+const removeCartItem = async (id) => {
+  return await axiosInstance.delete(`${CART_URL}/${id}`)
+}
+
 export const productApis = {
   getAllProductApi,
   getProductById,
   addProductToCart,
-  getAllUserCart
+  getAllUserCart,
+  removeCartItem
 }
