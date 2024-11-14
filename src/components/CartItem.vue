@@ -4,7 +4,7 @@ import { useStore } from 'vuex'
 import priceFormatter from '@/utils/formatPrice'
 import { useMutation } from '@tanstack/vue-query'
 import { productApis } from '@/apis/productApi'
-import { toastifyError, toastifySuccess } from '@/utils/toastify'
+import { toastifyError } from '@/utils/toastify'
 
 // TODO: remove hard code size name
 // TODO: remove cart item
@@ -18,9 +18,8 @@ const props = defineProps({
 
 const { mutate: RemoveItem } = useMutation({
   mutationFn: productApis.removeCartItem,
-  onSuccess: (data) => {
-    const { message } = data
-    toastifySuccess(message)
+  onSuccess: () => {
+    store.dispatch('cart/RemoveCartItemToList', props.item)
   },
   onError: (data) => {
     const { message } = data
@@ -47,12 +46,12 @@ const formattedPrice = computed(() => priceFormatter.format(props.item.price))
 const handleCheckBox = (e) => {
   const isSelected = e.target.checked
   if (isSelected) {
-    store.dispatch('cart/AddCartItem', {
+    store.dispatch('cart/AddCartItemSelected', {
       ...props.item,
       quantity: quantity.value
     })
   } else {
-    store.dispatch('cart/RemoveCartItem', {
+    store.dispatch('cart/RemoveCartItemUnselect', {
       ...props.item,
       quantity: quantity.value
     })
@@ -65,8 +64,7 @@ const handleChooseSize = (e) => {
 
 // TODO: when we remove item, we should also remove from cart in store which is selected before
 const handleRemoveItem = () => {
-  store.dispatch('cart/RemoveCartItem', props.item)
-  RemoveItem(props.item.id)
+  RemoveItem(props.item?.id)
 }
 </script>
 

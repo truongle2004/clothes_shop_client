@@ -16,20 +16,25 @@ const mutations = {
     }
   },
   setListCartItem(state, product) {
-    console.log(product)
     state.listCartItem = product
+  },
+  removeCartItemToList(state, product) {
+    state.listCartItem = state.listCartItem.filter((item) => item.id !== product.id)
   }
 }
 
 const actions = {
-  AddCartItem({ commit }, cartItem) {
+  AddCartItemSelected({ commit }, cartItem) {
     commit('setSelectedCartItem', cartItem)
   },
-  RemoveCartItem({ commit }, cartItem) {
+  RemoveCartItemUnSelect({ commit }, cartItem) {
     commit('removeCartItemSelected', cartItem)
   },
   SetListCartItem({ commit }, listCartItem) {
     commit('setListCartItem', listCartItem)
+  },
+  RemoveCartItemToList({ commit }, cartItem) {
+    commit('removeCartItemToList', cartItem)
   }
 }
 
